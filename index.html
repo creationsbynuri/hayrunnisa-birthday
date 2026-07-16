@@ -282,6 +282,12 @@
   }
   .polaroid-face.front{ background:linear-gradient(160deg,#fff,var(--cream-deep)); }
   .polaroid-face.front svg{ width:22px; height:22px; color:var(--bordeaux); opacity:.4; }
+  .polaroid-face.front img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:3px;
+  }
   .polaroid-face.back{
     transform:rotateY(180deg); background:linear-gradient(160deg, var(--gold-soft), var(--cream));
     justify-content:center;
@@ -793,19 +799,19 @@
     <div class="polaroid-grid reveal r2 discovery-target" data-discovery-key="polaroids" data-discovery-text="Fotoğraflara dokun. Arkalarında küçük notlar var. 🤍">
       <div class="polaroid" data-note="Seninle geçen ilk günlerden biri.">
         <div class="polaroid-inner">
-          <div class="polaroid-face front"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg></div>
+          <div class="polaroid-face front"><img src="media/photo1.jpg" alt="Birlikte çekildiğimiz ilk anılardan biri"></div>
           <div class="polaroid-face back"><p>Seninle geçen ilk günlerden biri.</p></div>
         </div>
       </div>
       <div class="polaroid" data-note="Gülüşün her fotoğrafta ayrı güzel.">
         <div class="polaroid-inner">
-          <div class="polaroid-face front"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg></div>
+          <div class="polaroid-face front"><img src="media/photo2.jpg" alt="Birlikte güzel bir anımız"></div>
           <div class="polaroid-face back"><p>Gülüşün her fotoğrafta ayrı güzel.</p></div>
         </div>
       </div>
       <div class="polaroid" data-note="Bugün buna bir tane daha eklenecek.">
         <div class="polaroid-inner">
-          <div class="polaroid-face front"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg></div>
+          <div class="polaroid-face front"><img src="media/photo3.jpg" alt="Bugüne eklenen bir başka güzel anı"></div>
           <div class="polaroid-face back"><p>Bugün buna bir tane daha eklenecek.</p></div>
         </div>
       </div>
