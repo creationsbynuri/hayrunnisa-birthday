@@ -1847,12 +1847,15 @@
       mainVideo.onerror = null;
       mainVideo.ontimeupdate = null;
       mainVideo.onloadedmetadata = null;
+      mainVideo.oncanplay = null;
       mainVideo.removeAttribute('src');
       mainVideo.load();
     }catch(e){}
     mainVideo.classList.remove('active');
     cinemaImage.classList.remove('active');
     cinemaText.classList.remove('active');
+    cinemaImage.onload = null;
+    cinemaImage.onerror = null;
     cinemaImage.removeAttribute('src');
     cinemaText.textContent = '';
   }
@@ -1887,32 +1890,33 @@
     });
   }
 
-  function mediaExists(url, type){
-    return new Promise(function(resolve){
-      if(type === 'image'){
-        var probe = new Image();
-        probe.onload = function(){ resolve(true); };
-        probe.onerror = function(){ resolve(false); };
-        probe.src = url;
-      } else {
-        var probeVideo = document.createElement('video');
-        var settled = false;
-        function done(ok){ if(settled) return; settled = true; probeVideo.removeAttribute('src'); resolve(ok); }
-        probeVideo.preload = 'metadata';
-        probeVideo.onloadedmetadata = function(){ done(true); };
-        probeVideo.onerror = function(){ done(false); };
-        probeVideo.src = url;
-        setTimeout(function(){ done(false); }, 5000);
-      }
-    });
+  var cinemaLoadTimer = null;
+  var cinemaResumeHandler = null;
+
+  function clearCinemaLoadState(){
+    clearTimeout(cinemaLoadTimer);
+    cinemaLoadTimer = null;
+    if(cinemaResumeHandler){
+      videoOverlay.removeEventListener('click', cinemaResumeHandler);
+      cinemaResumeHandler = null;
+    }
+  }
+
+  function continueCinema(runId){
+    if(runId !== cinemaRunId) return;
+    cinemaIndex++;
+    playCinemaItem(runId);
   }
 
   async function playCinemaItem(runId){
     if(runId !== cinemaRunId) return;
     var seq = CONFIG.media.donationSequence || [];
     if(cinemaIndex >= seq.length){ finishCinema(); return; }
+
+    clearCinemaLoadState();
     clearCinemaVisuals();
     renderCinemaProgress();
+
     var item = seq[cinemaIndex];
     if(cinemaStatus) cinemaStatus.textContent = '';
 
@@ -1921,49 +1925,94 @@
       var textDuration = item.duration || 3000;
       requestAnimationFrame(function(){ cinemaText.classList.add('active'); });
       startTimedCinemaProgress(textDuration);
-      cinemaTimer = setTimeout(function(){ cinemaIndex++; playCinemaItem(runId); }, textDuration);
+      cinemaTimer = setTimeout(function(){ continueCinema(runId); }, textDuration);
       return;
     }
 
-    var exists = await mediaExists(item.src, item.type);
-    if(runId !== cinemaRunId) return;
-    if(!exists){ cinemaIndex++; playCinemaItem(runId); return; }
-
     if(item.type === 'image'){
-      cinemaImage.src = item.src;
       var imageDuration = item.duration || 3400;
-      requestAnimationFrame(function(){ cinemaImage.classList.add('active'); });
-      startTimedCinemaProgress(imageDuration);
-      cinemaTimer = setTimeout(function(){ cinemaIndex++; playCinemaItem(runId); }, imageDuration);
+      var imageSettled = false;
+
+      function imageDone(ok){
+        if(imageSettled || runId !== cinemaRunId) return;
+        imageSettled = true;
+        clearTimeout(cinemaLoadTimer);
+        if(!ok){ continueCinema(runId); return; }
+        requestAnimationFrame(function(){ cinemaImage.classList.add('active'); });
+        startTimedCinemaProgress(imageDuration);
+        cinemaTimer = setTimeout(function(){ continueCinema(runId); }, imageDuration);
+      }
+
+      cinemaImage.onload = function(){ imageDone(true); };
+      cinemaImage.onerror = function(){ imageDone(false); };
+      cinemaImage.src = item.src;
+      cinemaLoadTimer = setTimeout(function(){ imageDone(false); }, 20000);
       return;
     }
 
     if(item.type === 'video'){
-      mainVideo.src = item.src;
-      mainVideo.currentTime = 0;
-      mainVideo.onloadedmetadata = function(){ setCinemaItemProgress(0, 0); };
+      var videoSettled = false;
+
+      function skipVideo(){
+        if(videoSettled || runId !== cinemaRunId) return;
+        videoSettled = true;
+        clearCinemaLoadState();
+        continueCinema(runId);
+      }
+
+      function attemptVideoPlay(){
+        if(runId !== cinemaRunId) return;
+        requestAnimationFrame(function(){ mainVideo.classList.add('active'); });
+        var playPromise;
+        try{ playPromise = mainVideo.play(); }
+        catch(e){ skipVideo(); return; }
+
+        if(playPromise && playPromise.catch){
+          playPromise.catch(function(){
+            if(runId !== cinemaRunId) return;
+            if(cinemaStatus) cinemaStatus.textContent = 'Sonraki videoyu oynatmak için ekrana dokun.';
+            cinemaResumeHandler = function(e){
+              if(e && e.target === videoCloseBtn) return;
+              videoOverlay.removeEventListener('click', cinemaResumeHandler);
+              cinemaResumeHandler = null;
+              if(cinemaStatus) cinemaStatus.textContent = '';
+              mainVideo.play().catch(skipVideo);
+            };
+            videoOverlay.addEventListener('click', cinemaResumeHandler);
+          });
+        }
+      }
+
+      mainVideo.onloadedmetadata = function(){
+        clearTimeout(cinemaLoadTimer);
+        setCinemaItemProgress(0, 0);
+        attemptVideoPlay();
+      };
+      mainVideo.oncanplay = function(){
+        clearTimeout(cinemaLoadTimer);
+      };
       mainVideo.ontimeupdate = function(){
         if(isFinite(mainVideo.duration) && mainVideo.duration > 0){
           setCinemaItemProgress((mainVideo.currentTime / mainVideo.duration) * 100, 0);
         }
       };
-      mainVideo.onended = function(){ setCinemaItemProgress(100, 0); cinemaIndex++; playCinemaItem(runId); };
-      mainVideo.onerror = function(){ cinemaIndex++; playCinemaItem(runId); };
-      requestAnimationFrame(function(){ mainVideo.classList.add('active'); });
-      try{
-        var playPromise = mainVideo.play();
-        if(playPromise && playPromise.catch){
-          playPromise.catch(function(){
-            if(cinemaStatus) cinemaStatus.textContent = 'Devam etmek için ekrana dokun.';
-            var resume = function(){
-              videoOverlay.removeEventListener('click', resume);
-              mainVideo.play().catch(function(){ cinemaIndex++; playCinemaItem(runId); });
-            };
-            videoOverlay.addEventListener('click', resume, { once:true });
-          });
-        }
-      }catch(e){ cinemaIndex++; playCinemaItem(runId); }
+      mainVideo.onended = function(){
+        if(videoSettled) return;
+        videoSettled = true;
+        clearCinemaLoadState();
+        setCinemaItemProgress(100, 0);
+        continueCinema(runId);
+      };
+      mainVideo.onerror = skipVideo;
+      mainVideo.preload = 'auto';
+      mainVideo.src = item.src;
+      mainVideo.currentTime = 0;
+      mainVideo.load();
+      cinemaLoadTimer = setTimeout(skipVideo, 30000);
+      return;
     }
+
+    continueCinema(runId);
   }
 
   function openVideoOverlay(){
