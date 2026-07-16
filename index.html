@@ -438,6 +438,21 @@
   #progressCloseBtn{ margin-top:6px; }
 
   /* ==========================================================================
+     14B. NAVIGATION / ZEITLEISTE / TESTMENÜ
+  ========================================================================== */
+  .top-nav-btn{position:fixed;top:calc(16px + var(--safe-top));z-index:110;width:42px;height:42px;border-radius:50%;display:none;align-items:center;justify-content:center;border:1px solid rgba(198,161,91,.42);background:rgba(255,255,255,.76);color:var(--gold-deep);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 9px 24px -14px rgba(43,36,32,.4);cursor:pointer}
+  .top-nav-btn.show{display:flex}.top-nav-btn:active{transform:scale(.94)}#backBtn{left:16px}#timelineBtn{right:16px}.top-nav-btn svg{width:19px;height:19px}
+  #timelineOverlay{position:fixed;inset:0;z-index:180;display:none;background:linear-gradient(180deg,var(--cream),var(--white));padding:calc(62px + var(--safe-top)) 20px calc(32px + var(--safe-bottom));overflow:auto;-webkit-overflow-scrolling:touch}
+  #timelineOverlay.active{display:block}.timeline-inner{max-width:520px;margin:0 auto;text-align:center}.timeline-list{list-style:none;padding:0;margin:22px 0;text-align:left}
+  .timeline-entry{width:100%;min-height:50px;margin:0 0 10px;padding:12px 14px;border-radius:15px;border:1px solid rgba(198,161,91,.28);background:rgba(255,255,255,.78);color:var(--ink);display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer}
+  .timeline-entry:disabled{opacity:.42;cursor:default}.timeline-entry.current{border-color:var(--gold-deep);box-shadow:0 0 0 3px rgba(198,161,91,.12)}
+  .timeline-number{width:27px;height:27px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--cream-deep);color:var(--gold-deep);font-size:12px;font-weight:700}.timeline-entry.visited .timeline-number{background:var(--bordeaux);color:#fff}
+  .timeline-entry-text strong{display:block;font-size:14px}.timeline-entry-text small{display:block;margin-top:2px;color:var(--ink-soft);font-size:11px}
+  .test-panel{display:none;margin:18px 0 0;padding:18px;border-radius:18px;border:1px dashed rgba(124,49,65,.42);background:rgba(124,49,65,.05)}.test-mode .test-panel{display:block}
+  .test-badge{position:fixed;left:50%;transform:translateX(-50%);top:calc(17px + var(--safe-top));z-index:111;display:none;padding:6px 11px;border-radius:999px;background:var(--bordeaux);color:#fff;font-size:10px;letter-spacing:.12em}.test-mode .test-badge{display:block}
+  .test-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}.test-actions .btn{font-size:13px;min-height:42px;padding:9px 16px}
+
+  /* ==========================================================================
      15. DATE-TAG (versteckter Test-Reset)
   ========================================================================== */
   .date-tag{
@@ -1216,6 +1231,14 @@
 </div>
 
 <!-- ======================================================================
+     NAVIGATION / ZEITLEISTE / TESTMODUS
+====================================================================== -->
+<button class="top-nav-btn" id="backBtn" type="button" aria-label="Önceki sayfa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 18l-6-6 6-6"/></svg></button>
+<button class="top-nav-btn" id="timelineBtn" type="button" aria-label="Sayfalar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 6h14M5 12h14M5 18h14"/><circle cx="3" cy="6" r=".7" fill="currentColor"/><circle cx="3" cy="12" r=".7" fill="currentColor"/><circle cx="3" cy="18" r=".7" fill="currentColor"/></svg></button>
+<div class="test-badge">TEST MODU</div>
+<div id="timelineOverlay" aria-label="Sayfa zaman çizelgesi"><div class="timeline-inner"><div class="eyebrow">Yolculuk</div><h2>Sayfalar</h2><p class="lede" style="font-size:.9rem;margin-bottom:12px;">Daha önce gördüğün sayfalara dönebilirsin.</p><div class="timeline-list" id="timelineList"></div><div class="test-panel"><div class="eyebrow" style="margin-bottom:10px;">Geliştirici</div><p class="lede" style="font-size:.85rem;margin-bottom:15px;">Test modunda tüm sayfalar açıktır.</p><div class="test-actions"><button class="btn btn-outline" id="testResetBtn" type="button">Her şeyi sıfırla</button><button class="btn btn-gold" id="testCloseBtn" type="button">Kapat</button></div></div><button class="btn btn-outline" id="timelineCloseBtn" type="button">Kapat</button></div></div>
+
+<!-- ======================================================================
      FORTSCHRITTS-FAB & OVERLAY
 ====================================================================== -->
 <button class="progress-fab" id="progressFab" type="button" aria-label="İlerleme">
@@ -1284,7 +1307,9 @@
     eveningRevealed: false,
     preferences: {},
     uploads: {},
-    remoteUploads: {}
+    remoteUploads: {},
+    visitedScreens: ['s-hero'],
+    navigationHistory: []
   };
   function cloneDefault(){ return JSON.parse(JSON.stringify(defaultState)); }
   function loadState(){
@@ -1301,6 +1326,8 @@
   if(!state.preferences || typeof state.preferences !== 'object') state.preferences = {};
   if(!state.uploads || typeof state.uploads !== 'object') state.uploads = {};
   if(!state.remoteUploads || typeof state.remoteUploads !== 'object') state.remoteUploads = {};
+  if(!Array.isArray(state.visitedScreens)) state.visitedScreens = [state.screen || 's-hero'];
+  if(!Array.isArray(state.navigationHistory)) state.navigationHistory = [];
 
   var supabaseClient = null;
   var supabaseUser = null;
@@ -1386,6 +1413,12 @@
      Freischaltung durchs Scrollen. IntersectionObserver wird hier NICHT
      für den Spielfortschritt verwendet.
   ======================================================================== */
+  var IS_TEST_MODE = new URLSearchParams(window.location.search).get('test') === '1';
+  if(IS_TEST_MODE) document.documentElement.classList.add('test-mode');
+  var SCREEN_ORDER = [
+    {id:'s-hero',label:'Başlangıç',note:'Doğum günü mesajı'},{id:'s-together',label:'Anılar',note:'Fotoğrafların küçük sırları'},{id:'s-photo-her',label:'Görev 1',note:'Şu anki fotoğrafın'},{id:'s-photo-kuymak',label:'Görev 2',note:'Kuymak'},{id:'s-photo-together',label:'Görev 3',note:'Kuymak ile selfie'},{id:'s-time',label:'Saat',note:'Günün başlangıcı'},{id:'s-tasks',label:'Bugünün görevleri',note:'Küçük hatırlatmalar'},{id:'s-preferences',label:'Bugün',note:'Yemek ve günün havası'},{id:'s-overview',label:'Yolculuk',note:'Günün planı'},{id:'s-car-selfie',label:'Görev 4',note:'Arabada ortak selfie'},{id:'s-gate-meeting',label:'Buluşma',note:'İlk şifre'},{id:'s-ch1',label:'Bölüm 1',note:'Geçmişten bir mutluluk'},{id:'s-ch2',label:'Bölüm 2',note:'Bize ait bir yer'},{id:'s-love-question',label:'Küçük soru',note:'Seni anladığımı bil'},{id:'s-gift-trabzon',label:'Hediye 1',note:'Bordo-mavi'},{id:'s-gift-douglas',label:'Hediye 2',note:'Koku'},{id:'s-gift-shark',label:'Hediye 3',note:'Her zaman hepsi'},{id:'s-gift-childhood',label:'Hediye 4',note:'Çocukluk'},{id:'s-final-video',label:'Final',note:'Son bir sürpriz'},{id:'s-close',label:'Günün sonu',note:'Akşama kadar'},{id:'s-evening',label:'Son bölüm',note:'Güzel bir başlangıç'}
+  ];
+
   var PROLOG_SCREENS = ['s-hero','s-together','s-preferences','s-photo-her','s-photo-kuymak','s-photo-together','s-time','s-tasks','s-overview','s-car-selfie'];
 
   function showScreen(id, opts){
@@ -1394,10 +1427,14 @@
     if(!next) return;
     var current = $('.screen.active');
     if(current && current !== next){
+      if(!opts.fromBack && !opts.skipHistory){
+        if(state.navigationHistory[state.navigationHistory.length - 1] !== current.id){ state.navigationHistory.push(current.id); if(state.navigationHistory.length > 60) state.navigationHistory.shift(); }
+      }
       current.classList.remove('active');
       if(current.id === 's-gift-childhood') stopChildhoodMusic();
     }
     next.classList.add('active');
+    if(state.visitedScreens.indexOf(id) === -1) state.visitedScreens.push(id);
     window.scrollTo(0,0);
     requestAnimationFrame(function(){
       $all('.reveal', next).forEach(function(el){ el.classList.add('show'); });
@@ -1405,6 +1442,7 @@
     state.screen = id;
     saveState();
     onScreenEnter(id, opts);
+    updateNavigationButtons(id);
   }
 
   function stopChildhoodMusic(){
@@ -1451,6 +1489,18 @@
       showScreen(btn.getAttribute('data-goto'));
     });
   });
+
+  /* ========================================================================
+     ZURÜCK / ZEITLEISTE / TESTMODUS
+  ======================================================================== */
+  var backBtn=document.getElementById('backBtn'),timelineBtn=document.getElementById('timelineBtn'),timelineOverlay=document.getElementById('timelineOverlay'),timelineList=document.getElementById('timelineList'),timelineCloseBtn=document.getElementById('timelineCloseBtn'),testCloseBtn=document.getElementById('testCloseBtn'),testResetBtn=document.getElementById('testResetBtn');
+  function updateNavigationButtons(id){var open=timelineOverlay&&timelineOverlay.classList.contains('active');var canBack=state.navigationHistory.length>0&&id!=='s-hero'&&id!=='s-final-video'&&id!=='s-evening';if(backBtn)backBtn.classList.toggle('show',canBack&&!open);if(timelineBtn)timelineBtn.classList.toggle('show',id!=='s-final-video'&&!open)}
+  function goBackOneScreen(){while(state.navigationHistory.length){var previous=state.navigationHistory.pop();if(previous&&document.getElementById(previous)&&previous!==state.screen){showScreen(previous,{fromBack:true,skipHistory:true});return}}updateNavigationButtons(state.screen)}
+  function closeTimeline(){if(!timelineOverlay)return;timelineOverlay.classList.remove('active');updateNavigationButtons(state.screen)}
+  function renderTimeline(){if(!timelineList)return;timelineList.innerHTML='';SCREEN_ORDER.forEach(function(item,index){var visited=state.visitedScreens.indexOf(item.id)!==-1;var allowed=IS_TEST_MODE||visited||item.id===state.screen;var button=document.createElement('button');button.type='button';button.className='timeline-entry'+(visited?' visited':'')+(item.id===state.screen?' current':'');button.disabled=!allowed;var number=document.createElement('span');number.className='timeline-number';number.textContent=visited?'✓':String(index+1);var text=document.createElement('span');text.className='timeline-entry-text';var strong=document.createElement('strong');strong.textContent=allowed?item.label:'Henüz kilitli';var small=document.createElement('small');small.textContent=allowed?item.note:'Bu bölüm daha sonra açılacak';text.appendChild(strong);text.appendChild(small);button.appendChild(number);button.appendChild(text);if(allowed)button.addEventListener('click',function(){closeTimeline();showScreen(item.id)});timelineList.appendChild(button)})}
+  function openTimeline(){renderTimeline();timelineOverlay.classList.add('active');updateNavigationButtons(state.screen)}
+  async function resetAllProgress(){if(!window.confirm('Tüm test ilerlemesi ve yerel fotoğraflar silinsin mi?'))return;state=cloneDefault();state.visitedScreens=['s-hero'];state.navigationHistory=[];try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){}if(remoteReady&&supabaseClient&&supabaseUser){try{await supabaseClient.from('birthday_sessions').upsert(remotePayload(),{onConflict:'id'})}catch(e){}}location.href=location.pathname+(IS_TEST_MODE?'?test=1':'')}
+  if(backBtn)backBtn.addEventListener('click',goBackOneScreen);if(timelineBtn)timelineBtn.addEventListener('click',openTimeline);if(timelineCloseBtn)timelineCloseBtn.addEventListener('click',closeTimeline);if(testCloseBtn)testCloseBtn.addEventListener('click',closeTimeline);if(testResetBtn)testResetBtn.addEventListener('click',resetAllProgress);if(timelineOverlay)timelineOverlay.addEventListener('click',function(e){if(e.target===timelineOverlay)closeTimeline()});
 
   /* ========================================================================
      CODE-GATES — generisch für alle Schloss-Screens
@@ -2200,6 +2250,9 @@
     ['her','kuymak','kuymakSelfie','carSelfie'].forEach(updateUploadCard);
     if(target === 's-car-selfie') startCarMissionTimer();
     scheduleDiscoveryHint(target);
+    if(state.visitedScreens.indexOf(target) === -1) state.visitedScreens.push(target);
+    updateNavigationButtons(target);
+    saveState();
   }
 
   (async function init(){
