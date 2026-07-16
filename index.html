@@ -348,11 +348,13 @@
   #s-gift-trabzon{ background:linear-gradient(160deg, #FBF1F3, #EAF8FC); }
   #s-gift-trabzon .eyebrow{ color:var(--ts-bordo); }
   .ts-badge{
-    width:60px; height:60px; margin:0 auto 20px; border-radius:50%;
-    background:conic-gradient(from 180deg, var(--ts-bordo) 0 50%, var(--ts-sky) 50% 100%);
-    box-shadow:0 10px 24px -10px rgba(124,49,65,.4); position:relative;
+    width:82px; height:82px; margin:0 auto 20px; border-radius:22px;
+    background:rgba(255,255,255,.86);
+    border:1px solid rgba(124,45,66,.18);
+    box-shadow:0 14px 30px -14px rgba(124,49,65,.4); position:relative;
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
   }
-  .ts-badge svg{ position:absolute; inset:0; margin:auto; width:22px; height:22px; color:#fff; }
+  .ts-badge svg{ width:72px; height:72px; display:block; }
   #s-gift-trabzon .quiz-opt.correct{ background:rgba(124,45,66,.18); border-color:var(--ts-bordo); }
   #s-gift-trabzon .quiz-opt.correct::before{ background:var(--ts-bordo); border-color:var(--ts-bordo); }
 
@@ -402,6 +404,16 @@
     border-radius:0 0 10px 10px; border:1px solid rgba(198,161,91,.4);
   }
   .music-note{ font-size:12px; color:var(--ink-soft); opacity:.55; margin:2px 0 6px; letter-spacing:.04em; }
+  .childhood-envelope{
+    width:150px; height:104px; margin:26px auto 12px; position:relative; cursor:pointer;
+    filter:drop-shadow(0 15px 18px rgba(124,49,65,.16)); perspective:900px;
+  }
+  .childhood-envelope .env-back{ position:absolute; inset:0; border-radius:12px; background:linear-gradient(145deg,#fff,var(--cream-deep)); border:1px solid rgba(198,161,91,.46); }
+  .childhood-envelope .env-flap{ position:absolute; left:1px; right:1px; top:1px; height:58px; background:linear-gradient(145deg,var(--gold-soft),#fff4d8); clip-path:polygon(0 0,100% 0,50% 100%); transform-origin:top; transition:transform .9s var(--ease-out); z-index:3; }
+  .childhood-envelope .env-letter{ position:absolute; left:13px; right:13px; bottom:9px; height:70px; border-radius:9px; background:#fff; border:1px solid rgba(198,161,91,.3); display:flex; align-items:center; justify-content:center; padding:10px; color:var(--bordeaux); font-family:var(--font-display); font-size:13px; line-height:1.35; transition:transform .9s var(--ease-out), opacity .6s; z-index:2; }
+  .childhood-envelope.open .env-flap{ transform:rotateX(170deg); }
+  .childhood-envelope.open .env-letter{ transform:translateY(-52px); }
+  .after-ride-note{ margin:18px 0 0; padding:16px; border-radius:18px; background:rgba(255,255,255,.72); border:1px solid rgba(198,161,91,.34); color:var(--ink-soft); font-size:13px; line-height:1.55; }
 
   /* ==========================================================================
      14. FORTSCHRITTS-FAB & OVERLAY
@@ -430,10 +442,11 @@
     border-bottom:1px solid rgba(198,161,91,.18); color:var(--ink-soft);
   }
   .progress-item:last-child{ border-bottom:none; }
-  .progress-dot{ width:10px; height:10px; border-radius:50%; background:rgba(198,161,91,.35); flex:none; }
+  .progress-dot{ width:22px; height:22px; border-radius:50%; background:rgba(198,161,91,.18); flex:none; display:grid; place-items:center; color:var(--gold-deep); font-size:12px; font-weight:700; }
   .progress-item.current{ color:var(--ink); font-weight:600; }
-  .progress-item.current .progress-dot{ background:var(--gold-deep); box-shadow:0 0 0 4px rgba(198,161,91,.2); }
-  .progress-item.done .progress-dot{ background:var(--bordeaux); }
+  .progress-item.current .progress-dot{ background:var(--gold-deep); color:#fff; box-shadow:0 0 0 4px rgba(198,161,91,.2); animation:progressPulse 1.8s ease-in-out infinite; }
+  .progress-item.done .progress-dot{ background:var(--bordeaux); color:#fff; }
+  @keyframes progressPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
   .progress-item.done{ color:var(--ink); }
   #progressCloseBtn{ margin-top:6px; }
 
@@ -698,6 +711,28 @@
     .discovery-copy .spark,.discovery-hint .hint-star{ animation:none !important; }
   }
 
+
+
+  /* ========================================================================
+     19. CINEMATIC DONATION FINALE
+  ======================================================================== */
+  #videoOverlay{
+    background:#080706;
+    overflow:hidden;
+  }
+  .cinema-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#080706}
+  .cinema-media{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#080706;opacity:0;transform:scale(1.015);transition:opacity .75s ease,transform 4.5s ease;pointer-events:none}
+  .cinema-media.active{opacity:1;transform:scale(1.055)}
+  .cinema-text{position:absolute;left:24px;right:24px;top:50%;transform:translateY(-44%);z-index:4;margin:auto;max-width:560px;color:#FBF3E4;font-family:var(--font-display);font-size:clamp(1.45rem,6.5vw,2.35rem);line-height:1.42;text-align:center;opacity:0;transition:opacity .75s ease,transform .75s var(--ease-out);text-shadow:0 4px 28px rgba(0,0,0,.65)}
+  .cinema-text.active{opacity:1;transform:translateY(-50%)}
+  .cinema-vignette{position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(circle at center,transparent 42%,rgba(0,0,0,.35) 100%)}
+  .cinema-progress{position:absolute;left:22px;right:22px;bottom:calc(20px + var(--safe-bottom));z-index:6;display:flex;gap:6px;justify-content:center}
+  .cinema-progress span{height:3px;max-width:46px;flex:1;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden}
+  .cinema-progress span::after{content:"";display:block;width:0;height:100%;background:var(--gold-soft);transition:width .3s linear}
+  .cinema-progress span.done::after{width:100%}.cinema-progress span.current::after{width:45%}
+  .cinema-status{position:absolute;left:20px;right:20px;bottom:calc(42px + var(--safe-bottom));z-index:6;text-align:center;color:rgba(255,255,255,.58);font-size:11px;letter-spacing:.04em}
+  .video-close{z-index:8}
+
 </style>
 </head>
 <body>
@@ -890,13 +925,14 @@
   <div class="screen-inner">
     <div class="eyebrow reveal r1">Bugün</div>
     <h2 class="reveal r2">Bugünkü Yolculuğumuz</h2>
-    <ul class="progress-list reveal r3" style="margin:0 auto 28px;">
-      <li class="progress-item"><span class="progress-dot"></span><span>Başlangıç</span></li>
-      <li class="progress-item"><span class="progress-dot"></span><span>Geçmişten bir mutluluk</span></li>
-      <li class="progress-item"><span class="progress-dot"></span><span>Bize ait bir yer</span></li>
-      <li class="progress-item"><span class="progress-dot"></span><span>Hediyeler</span></li>
-      <li class="progress-item"><span class="progress-dot"></span><span>Final</span></li>
+    <ul class="progress-list reveal r3" style="margin:0 auto 22px;">
+      <li class="progress-item done"><span class="progress-dot">✓</span><span>Başlangıç</span></li>
+      <li class="progress-item current"><span class="progress-dot">●</span><span>Bir sonraki adım</span></li>
+      <li class="progress-item"><span class="progress-dot">✦</span><span>Küçük bir sürpriz</span></li>
+      <li class="progress-item"><span class="progress-dot">✦</span><span>Devam ediyor...</span></li>
+      <li class="progress-item"><span class="progress-dot">✦</span><span>Final</span></li>
     </ul>
+    <p class="choice-summary reveal r3" style="margin:0 0 24px;">Gerçek isimler zamanı geldikçe ortaya çıkacak. ✨</p>
     <p class="lede reveal r4">Şimdi uyu. Yarın uzun ve güzel bir gün olacak. 🤍</p>
     <button class="btn btn-outline reveal r4" data-goto="s-car-selfie">Devam et</button>
   </div>
@@ -958,7 +994,7 @@
     <h2 class="reveal r2">Bazı mutluluklar yıllarca sessizce bekler.</h2>
     <p class="lede reveal r3">Bugün çocukluğundan kalan güzel bir duyguyu yeniden yaşayacaksın.</p>
     <p class="lede reveal r3" style="margin-top:-18px;">Doğru an geldiğinde yeni şifreyi benden alacaksın.</p>
-    <div class="code-gate reveal r4" data-code="afterRiding" data-next="s-ch2">
+    <div class="code-gate reveal r4" data-code="afterRiding" data-next="s-after-riding">
       <svg class="code-gate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
       <p class="code-hint">Şifreyi aldığında buraya yaz.</p>
       <div class="code-input-row">
@@ -971,6 +1007,41 @@
   </div>
 </section>
 
+
+<!-- ======================================================================
+     REİT-MOMENT — FRAGE + FOTOS
+====================================================================== -->
+<section id="s-after-riding" class="screen" aria-label="At binişinden sonra">
+  <div class="screen-inner">
+    <div class="eyebrow reveal r1">Bir anı saklayalım</div>
+    <h2 class="reveal r2">Bunu yıllar sonra yeniden yaşamak nasıl hissettirdi?</h2>
+    <div class="quiz-options reveal r3" data-quiz="afterRideFeeling" data-correct="any">
+      <button class="quiz-opt" data-value="guzel">Çok güzel</button>
+      <button class="quiz-opt" data-value="duygusal">Biraz duygusal</button>
+      <button class="quiz-opt" data-value="cocukluk">Çocukluğuma dönmüş gibi</button>
+      <button class="quiz-opt" data-value="hepsi">Hepsi 🤍</button>
+    </div>
+    <div class="quiz-reveal" hidden>
+      <p class="lede reveal r1">Bu anı sadece hafızamızda değil, hikâyemizde de saklayalım.</p>
+      <div class="upload-card reveal r2" data-upload="horsePhoto">
+        <h3 class="choice-title" style="text-align:center;">Atla birlikte bir fotoğrafını yükle.</h3>
+        <div class="upload-preview" data-easter-note="Çocukluğundan kalan güzel bir hayal bugün yeniden gerçek oldu. 🤍" role="button" tabindex="0" aria-label="Fotoğrafın arkasındaki mesajı göster"><svg class="upload-placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg><img alt="At binişi fotoğrafı"></div>
+        <input class="file-input" id="file-horsePhoto" type="file" accept="image/*">
+        <label class="btn btn-gold" for="file-horsePhoto">Fotoğraf çek veya seç</label>
+        <p class="upload-status">Bu anın fotoğrafını ekle.</p>
+      </div>
+      <div class="upload-card reveal r3" data-upload="rideFavorite">
+        <h3 class="choice-title" style="text-align:center;">Bugünden şimdiye kadarki en sevdiğin kareyi seç.</h3>
+        <div class="upload-preview" data-easter-note="Senin seçtiğin bu kare, günün bu bölümünün küçük hatırası oldu. ✨" role="button" tabindex="0" aria-label="Fotoğrafın arkasındaki mesajı göster"><svg class="upload-placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg><img alt="Günün favori fotoğrafı"></div>
+        <input class="file-input" id="file-rideFavorite" type="file" accept="image/*">
+        <label class="btn btn-gold" for="file-rideFavorite">Fotoğraf seç</label>
+        <p class="upload-status">En sevdiğin kareyi ekle.</p>
+      </div>
+      <p class="after-ride-note reveal r4">İki fotoğraf da kaydedildiğinde bir sonraki durağa geçebilirsin.</p>
+      <button class="btn btn-gold reveal r5" id="afterRideContinueBtn" type="button" disabled>Devam et</button>
+    </div>
+  </div>
+</section>
 
 <!-- ======================================================================
      SCREEN 8 — BÖLÜM 2 (nach Reiten, vor Rhein)
@@ -1023,7 +1094,7 @@
 <section id="s-gift-trabzon" class="screen" aria-label="Hediye 1">
   <div class="screen-inner">
     <div class="eyebrow reveal r1">Hediye 1</div>
-    <div id="tsBadge" class="ts-badge reveal r2 discovery-target" data-discovery-key="tsBadge" data-discovery-text="Renklerin kalbine dokun. ❤️💙" role="button" tabindex="0"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 6.9L12 17.1 5.7 20.8l1.7-6.9-5.4-4.7 7.1-.6z"/></svg></div>
+    <div id="tsBadge" class="ts-badge reveal r2 discovery-target" data-discovery-key="tsBadge" data-discovery-text="Renklerin kalbine dokun. ❤️💙" role="button" tabindex="0" aria-label="Trabzonspor logosu"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.756 192.756"><g fill-rule="evenodd" clip-rule="evenodd"><path d="M160.666 75.435l-.023 56.114c-.238 19.146-1.133 28.482-19.758 44.598-11.951 9.096-27.654 14.111-42.854 13.719-20.741.74-42.026-5.432-55.504-23.139-7.197-10.383-10.447-24.818-10.447-39.146V11.644c5.17-2.727 13.283-5.234 20.261-6.652 9.749-2.006 20.326-2.988 30.336-1.287 5.452.916 11.776 3.162 17.926 6.062 4.93 2.334 12.104 6.87 18.014 9.792 9.902 4.864 18.232 7.394 29.355 4.886 3.926-.873 8.199-4.405 12.693-8.396v59.386h.001z" fill="#973030"/><path d="M83.011 41.266c-2.092-4.234-2.066-8.77-1.865-9.551 5.897-5.116 12.449-8.492 18.774-8.593.654 3.628.402 6.979-.328 9.046-2.873-1.159-16.153 6.956-16.581 9.098zm-1.285-12.852c1.31-7.207 8.643-13.28 16.481-13.784.881 2.117 1.283 3.528 1.486 6.148-10.105 1.261-13.608 4.386-17.967 7.636zm33.717 14.061c-2.646 4.108-6.932 7.106-7.889 7.031-7.131-3.225-12.473-6.602-15.22-12.272 3.049-2.394 5.593-2.898 7.359-3.049 4.586 5.946 13.582 8.819 15.75 8.29zm-10.332 8.165C97.752 52.958 88 49.909 84.12 43.105c1.537-1.738 3.881-3.477 6.199-4.812 5.468 8.668 10.054 9.827 14.792 12.347zm-4.41-36.035c4.711.328 8.668 2.747 9.273 3.351 1.512 7.661.932 14.641-2.168 20.21-3.402-1.285-5.52-4.384-6.098-4.586 2.017-6.3.378-15.548-1.007-18.975zm11.567 5.216c5.543 5.015 7.408 13.758 3.93 20.966-2.494.101-3.527-.353-5.895-1.487 3.955-9.449 2.644-14.162 1.965-19.479zm-80.185 39.79v29.231c6.224-8.442 14.313-13.658 21.822-16.379 13.406-4.183 33.742-2.092 39.991 4.032-17.361.755-31.195 6.425-41.729 20.46a68.457 68.457 0 0 0-9.273 16.859c-4.662 14.742-3.957 27.189-.832 36.967 7.308 22.83 30.441 36.111 53.448 36.162 16.076.023 37.648-4.033 48.76-21.471 7.232-11.717 11.693-33.162-2.52-46.367-7.055-6.576-12.549-7.533-17.338-8.744-4.787-1.209-10.834-2.596-13.783-6.752-1.764-2.445-1.939-5.721.504-7.762 1.211-.983 3.428-1.562 5.016-1.562 3.1 0 6.729 1.612 9.273 2.57l2.242-6.98c-2.57-2.847-3.68-3.276-10.055-5.191l.529-1.084c21.193-.252 29.986-1.386 42.537-8.114v-9.072c-7.283 4.637-15.725 7.661-24.242 7.661-7.156 0-14.516-2.822-19.303-4.813-3.881-1.588-10.332-6.653-14.111-8.971-2.219-1.335-7.157-4.863-12.373-7.963-6.703-2.343-11.213-6.174-24.771-6.905-12.851-.428-26.307 6.829-33.792 14.188zm76.077 24.796c-8.039 4.057-12.65 9.828-12.524 17.615.126 7.08 7.132 15.043 22.729 19.504 12.877 3.779 13.154 24.242 1.158 30.895-16.781 9.852-30.868 3.629-39.763-3.578-11.415-9.225-16.53-25.199-9.979-39.438 6.325-13.784 22.226-26.308 38.379-24.998z" fill="#2aa7e5"/></g></svg></div>
     <h2 class="reveal r3">Kalbin hangi renk?</h2>
     <div class="quiz-options reveal r4" data-quiz="trabzon" data-correct="bordo">
       <button class="quiz-opt" data-value="sari">Sarı-Lacivert</button>
@@ -1057,9 +1128,9 @@
     <div id="douglasMark" class="douglas-mark reveal r2 discovery-target" data-discovery-key="douglasMark" data-discovery-text="Şişeye dokun; küçük bir ışıltı saklı. ✨" role="button" tabindex="0"></div>
     <h2 class="reveal r3">Bu kokuyu neden seçtim dersin?</h2>
     <div class="quiz-options reveal r4" data-quiz="douglas" data-correct="any">
-      <button class="quiz-opt" data-value="tarz">Tarzına çok yakışacağını düşündüğüm için</button>
-      <button class="quiz-opt" data-value="hatira">Bana seni hatırlattığı için</button>
-      <button class="quiz-opt" data-value="ikimiz">İkimize de yakıştığını düşündüğüm için</button>
+      <button class="quiz-opt" data-value="tarz">Sana çok yakışacağını bildiğim için</button>
+      <button class="quiz-opt" data-value="hatira">Bu koku bana seni hatırlattığı için</button>
+      <button class="quiz-opt" data-value="anilar">Seni her hatırladığımda aklıma bu koku gelsin istediğim için</button>
     </div>
     <div class="quiz-reveal" hidden>
       <p class="lede reveal r1">Aslında üçü de doğru, Hayruşum.</p>
@@ -1111,7 +1182,7 @@
 </section>
 
 <!-- ======================================================================
-     GESCHENK 4 — ÇOCUKLUK KUTUSU (emotionaler Höhepunkt)
+     GESCHENK 4 — ÇOCUKLUK ZARFI (emotionaler Höhepunkt)
 ====================================================================== -->
 <section id="s-gift-childhood" class="screen" aria-label="Hediye 4">
   <div class="screen-inner">
@@ -1125,14 +1196,14 @@
     <p class="lede reveal r2">Şimdi biraz daha geriye gidiyoruz.</p>
     <p class="lede reveal r3" style="margin-top:-20px;">Henüz birbirimizi tanımadığımız yıllara...</p>
     <p class="lede reveal r4" style="margin-top:-20px;">Çocukken elini tutamadım.</p>
-    <p class="lede reveal r5" style="margin-top:-20px;">Ama içindeki o güzel çocuğun elini ömrüm boyunca bırakmak istiyorum.</p>
-    <button class="btn btn-gold reveal r6" id="btnOpenBox">Kutuyu aç</button>
+    <p class="lede reveal r5" style="margin-top:-20px;">İçindeki o güzel çocuğun elini ömrüm boyunca hiç bırakmak istemiyorum.</p>
+    <button class="btn btn-gold reveal r6" id="btnOpenBox">Zarfı aç</button>
     <div id="childhoodReveal" hidden>
-      <div class="childhood-box" id="childhoodBox"><div class="lid"></div><div class="base"></div></div>
-      <p class="lede reveal r1">Kutunun en altında son şifre seni bekliyor.</p>
+      <div class="childhood-envelope" id="childhoodBox" aria-hidden="true"><div class="env-back"></div><div class="env-letter">Son şifre gerçek zarfın içinde seni bekliyor. ✉️</div><div class="env-flap"></div></div>
+      <p class="lede reveal r1">Şimdi sana verdiğim gerçek zarfı aç. Son şifre onun içinde.</p>
       <div class="code-gate reveal r2" data-code="unlockFinal" data-next="s-final-video">
         <svg class="code-gate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
-        <p class="code-hint">Bulduğun son şifreyi buraya yaz.</p>
+        <p class="code-hint">Zarfın içindeki son şifreyi buraya yaz.</p>
         <div class="code-input-row">
           <input type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" class="code-input" placeholder="Şifre" aria-label="Şifre" maxlength="12">
           <button class="btn btn-gold code-submit" type="button">Aç</button>
@@ -1214,20 +1285,18 @@
   <audio id="childhoodMusic" preload="none"></audio>
 
 <!-- ======================================================================
-     VIDEO-OVERLAY
+     CINEMATIC DONATION FINALE
 ====================================================================== -->
-<div id="videoOverlay" aria-label="Video">
+<div id="videoOverlay" aria-label="Bağış videosu">
   <button class="video-close" id="videoCloseBtn" type="button">Kapat ✕</button>
-  <!-- REPLACE ME: video.mp4 -->
-  <video id="mainVideo" playsinline webkit-playsinline preload="none">
-    <source src="video.mp4" type="video/mp4">
-  </video>
-  <div class="video-controls" id="videoControls">
-    <button class="play-btn" id="videoPlayBtn" type="button" aria-label="Videoyu oynat">
-      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-    </button>
+  <div class="cinema-stage" id="cinemaStage">
+    <img id="cinemaImage" class="cinema-media" alt="Bağış anısı">
+    <video id="mainVideo" class="cinema-media" playsinline webkit-playsinline preload="metadata"></video>
+    <div class="cinema-text" id="cinemaText"></div>
+    <div class="cinema-vignette" aria-hidden="true"></div>
+    <div class="cinema-status" id="cinemaStatus">Hazırlanıyor...</div>
+    <div class="cinema-progress" id="cinemaProgress" aria-hidden="true"></div>
   </div>
-  <p class="video-note" id="videoNote">video.mp4 dosyasını ekleyince burada oynayacak</p>
 </div>
 
 <!-- ======================================================================
@@ -1274,12 +1343,21 @@
       unlockEvening:    '2140'
     },
     media: {
-      photo1: 'photo1.jpg',
-      photo2: 'photo2.jpg',
-      photo3: 'photo3.jpg',
-      childhood: 'childhood.jpg',
-      music: 'music.mp3',
-      video: 'video.mp4'
+      photo1: 'media/photo1.jpg',
+      photo2: 'media/photo2.jpg',
+      photo3: 'media/photo3.jpg',
+      childhood: 'media/childhood.jpg',
+      music: 'media/music.mp3',
+      donationSequence: [
+        { type: 'text', text: 'Bugün sana sadece hediyeler vermek istemedim...', duration: 2800 },
+        { type: 'image', src: 'media/donation1.jpeg', duration: 3400 },
+        { type: 'video', src: 'media/donation1.mp4' },
+        { type: 'image', src: 'media/donation2.jpeg', duration: 3400 },
+        { type: 'video', src: 'media/donation2.mp4' },
+        { type: 'video', src: 'media/donation3.mp4' },
+        { type: 'text', text: 'Mutluluk bazen paylaştıkça çoğalır.', duration: 3200 },
+        { type: 'text', text: 'İyi ki doğdun Hayrunnisa. ❤️', duration: 3600 }
+      ]
     },
     supabase: {
       url: 'https://bfbpnxglltzteijqpenz.supabase.co',
@@ -1416,7 +1494,7 @@
   var IS_TEST_MODE = new URLSearchParams(window.location.search).get('test') === '1';
   if(IS_TEST_MODE) document.documentElement.classList.add('test-mode');
   var SCREEN_ORDER = [
-    {id:'s-hero',label:'Başlangıç',note:'Doğum günü mesajı'},{id:'s-together',label:'Anılar',note:'Fotoğrafların küçük sırları'},{id:'s-photo-her',label:'Görev 1',note:'Şu anki fotoğrafın'},{id:'s-photo-kuymak',label:'Görev 2',note:'Kuymak'},{id:'s-photo-together',label:'Görev 3',note:'Kuymak ile selfie'},{id:'s-time',label:'Saat',note:'Günün başlangıcı'},{id:'s-tasks',label:'Bugünün görevleri',note:'Küçük hatırlatmalar'},{id:'s-preferences',label:'Bugün',note:'Yemek ve günün havası'},{id:'s-overview',label:'Yolculuk',note:'Günün planı'},{id:'s-car-selfie',label:'Görev 4',note:'Arabada ortak selfie'},{id:'s-gate-meeting',label:'Buluşma',note:'İlk şifre'},{id:'s-ch1',label:'Bölüm 1',note:'Geçmişten bir mutluluk'},{id:'s-ch2',label:'Bölüm 2',note:'Bize ait bir yer'},{id:'s-love-question',label:'Küçük soru',note:'Seni anladığımı bil'},{id:'s-gift-trabzon',label:'Hediye 1',note:'Bordo-mavi'},{id:'s-gift-douglas',label:'Hediye 2',note:'Koku'},{id:'s-gift-shark',label:'Hediye 3',note:'Her zaman hepsi'},{id:'s-gift-childhood',label:'Hediye 4',note:'Çocukluk'},{id:'s-final-video',label:'Final',note:'Son bir sürpriz'},{id:'s-close',label:'Günün sonu',note:'Akşama kadar'},{id:'s-evening',label:'Son bölüm',note:'Güzel bir başlangıç'}
+    {id:'s-hero',label:'Başlangıç',note:'Doğum günü mesajı'},{id:'s-together',label:'Anılar',note:'Fotoğrafların küçük sırları'},{id:'s-photo-her',label:'Görev 1',note:'Şu anki fotoğrafın'},{id:'s-photo-kuymak',label:'Görev 2',note:'Kuymak'},{id:'s-photo-together',label:'Görev 3',note:'Kuymak ile selfie'},{id:'s-time',label:'Saat',note:'Günün başlangıcı'},{id:'s-tasks',label:'Bugünün görevleri',note:'Küçük hatırlatmalar'},{id:'s-preferences',label:'Bugün',note:'Yemek ve günün havası'},{id:'s-overview',label:'Yolculuk',note:'Günün planı'},{id:'s-car-selfie',label:'Görev 4',note:'Arabada ortak selfie'},{id:'s-gate-meeting',label:'Buluşma',note:'İlk şifre'},{id:'s-ch1',label:'Bölüm 1',note:'Geçmişten bir mutluluk'},{id:'s-after-riding',label:'Bir anı saklayalım',note:'At binişinden kalan hisler'},{id:'s-ch2',label:'Bölüm 2',note:'Bize ait bir yer'},{id:'s-love-question',label:'Küçük soru',note:'Seni anladığımı bil'},{id:'s-gift-trabzon',label:'Hediye 1',note:'Bordo-mavi'},{id:'s-gift-douglas',label:'Hediye 2',note:'Koku'},{id:'s-gift-shark',label:'Hediye 3',note:'Her zaman hepsi'},{id:'s-gift-childhood',label:'Hediye 4',note:'Çocukluk'},{id:'s-final-video',label:'Final',note:'Son bir sürpriz'},{id:'s-close',label:'Günün sonu',note:'Akşama kadar'},{id:'s-evening',label:'Son bölüm',note:'Güzel bir başlangıç'}
   ];
 
   var PROLOG_SCREENS = ['s-hero','s-together','s-preferences','s-photo-her','s-photo-kuymak','s-photo-together','s-time','s-tasks','s-overview','s-car-selfie'];
@@ -1468,6 +1546,7 @@
   /* Stellt bereits erledigte Zwischenschritte innerhalb des aktuellen
      Screens wieder her (z.B. Quiz schon beantwortet, Kiste schon offen) */
   function restoreSubState(id){
+    if(id === 's-after-riding' && state.quiz.afterRideFeeling) revealQuizArea('afterRideFeeling', true);
     if(id === 's-gift-trabzon' && state.quiz.trabzon) revealQuizArea('trabzon', true);
     if(id === 's-gift-douglas' && state.quiz.douglas) revealQuizArea('douglas', true);
     if(id === 's-gift-shark' && state.quiz.shark) revealQuizArea('shark', true);
@@ -1497,7 +1576,40 @@
   function updateNavigationButtons(id){var open=timelineOverlay&&timelineOverlay.classList.contains('active');var canBack=state.navigationHistory.length>0&&id!=='s-hero'&&id!=='s-final-video'&&id!=='s-evening';if(backBtn)backBtn.classList.toggle('show',canBack&&!open);if(timelineBtn)timelineBtn.classList.toggle('show',id!=='s-final-video'&&!open)}
   function goBackOneScreen(){while(state.navigationHistory.length){var previous=state.navigationHistory.pop();if(previous&&document.getElementById(previous)&&previous!==state.screen){showScreen(previous,{fromBack:true,skipHistory:true});return}}updateNavigationButtons(state.screen)}
   function closeTimeline(){if(!timelineOverlay)return;timelineOverlay.classList.remove('active');updateNavigationButtons(state.screen)}
-  function renderTimeline(){if(!timelineList)return;timelineList.innerHTML='';SCREEN_ORDER.forEach(function(item,index){var visited=state.visitedScreens.indexOf(item.id)!==-1;var allowed=IS_TEST_MODE||visited||item.id===state.screen;var button=document.createElement('button');button.type='button';button.className='timeline-entry'+(visited?' visited':'')+(item.id===state.screen?' current':'');button.disabled=!allowed;var number=document.createElement('span');number.className='timeline-number';number.textContent=visited?'✓':String(index+1);var text=document.createElement('span');text.className='timeline-entry-text';var strong=document.createElement('strong');strong.textContent=allowed?item.label:'Henüz kilitli';var small=document.createElement('small');small.textContent=allowed?item.note:'Bu bölüm daha sonra açılacak';text.appendChild(strong);text.appendChild(small);button.appendChild(number);button.appendChild(text);if(allowed)button.addEventListener('click',function(){closeTimeline();showScreen(item.id)});timelineList.appendChild(button)})}
+  function renderTimeline(){
+    if(!timelineList)return;
+    timelineList.innerHTML='';
+    SCREEN_ORDER.forEach(function(item,index){
+      var visited=state.visitedScreens.indexOf(item.id)!==-1;
+      var isEvening=item.id==='s-evening';
+      var eveningUnlocked=state.eveningRevealed||state.solved.indexOf('unlockEvening')!==-1||!!state.quiz.evening;
+      var allowed=IS_TEST_MODE||visited||item.id===state.screen||(isEvening&&eveningUnlocked);
+      var button=document.createElement('button');
+      button.type='button';
+      button.className='timeline-entry'+(visited?' visited':'')+(item.id===state.screen?' current':'');
+      button.disabled=!allowed;
+      var number=document.createElement('span');
+      number.className='timeline-number';
+      number.textContent=visited?'✓':(isEvening?'★':'🔒');
+      var text=document.createElement('span');
+      text.className='timeline-entry-text';
+      var strong=document.createElement('strong');
+      var small=document.createElement('small');
+      if(isEvening&&!allowed){
+        strong.textContent='Son Bölüm';
+        small.textContent='Henüz zamanı gelmedi.';
+      }else if(allowed){
+        strong.textContent=item.label;
+        small.textContent=item.note;
+      }else{
+        strong.textContent='Küçük bir sır';
+        small.textContent='Zamanı geldiğinde açılacak.';
+      }
+      text.appendChild(strong);text.appendChild(small);button.appendChild(number);button.appendChild(text);
+      if(allowed)button.addEventListener('click',function(){closeTimeline();showScreen(item.id)});
+      timelineList.appendChild(button);
+    });
+  }
   function openTimeline(){renderTimeline();timelineOverlay.classList.add('active');updateNavigationButtons(state.screen)}
   async function resetAllProgress(){if(!window.confirm('Tüm test ilerlemesi ve yerel fotoğraflar silinsin mi?'))return;state=cloneDefault();state.visitedScreens=['s-hero'];state.navigationHistory=[];try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){}if(remoteReady&&supabaseClient&&supabaseUser){try{await supabaseClient.from('birthday_sessions').upsert(remotePayload(),{onConflict:'id'})}catch(e){}}location.href=location.pathname+(IS_TEST_MODE?'?test=1':'')}
   if(backBtn)backBtn.addEventListener('click',goBackOneScreen);if(timelineBtn)timelineBtn.addEventListener('click',openTimeline);if(timelineCloseBtn)timelineCloseBtn.addEventListener('click',closeTimeline);if(testCloseBtn)testCloseBtn.addEventListener('click',closeTimeline);if(testResetBtn)testResetBtn.addEventListener('click',resetAllProgress);if(timelineOverlay)timelineOverlay.addEventListener('click',function(e){if(e.target===timelineOverlay)closeTimeline()});
@@ -1590,6 +1702,7 @@
           state.quiz[name] = val;
           saveState();
           revealQuizArea(name, false);
+          if(name === 'afterRideFeeling') updateAfterRideContinue();
           smallConfetti();
         } else {
           btn.classList.add('wrong');
@@ -1639,14 +1752,19 @@
   });
 
   /* ========================================================================
-     VIDEO-OVERLAY — iOS-Safari-sicher
+     CINEMATIC DONATION FINALE — 2 JPEG + 3 MP4, fehlende Dateien werden
+     automatisch übersprungen. Start erfolgt nur durch echten Nutzer-Klick.
   ======================================================================== */
   var videoOverlay = document.getElementById('videoOverlay');
   var mainVideo = document.getElementById('mainVideo');
-  var videoPlayBtn = document.getElementById('videoPlayBtn');
-  var videoControls = document.getElementById('videoControls');
-  var videoNote = document.getElementById('videoNote');
+  var cinemaImage = document.getElementById('cinemaImage');
+  var cinemaText = document.getElementById('cinemaText');
+  var cinemaStatus = document.getElementById('cinemaStatus');
+  var cinemaProgress = document.getElementById('cinemaProgress');
   var videoCloseBtn = document.getElementById('videoCloseBtn');
+  var cinemaRunId = 0;
+  var cinemaIndex = 0;
+  var cinemaTimer = null;
   var scrollLockY = 0;
 
   function lockBodyScroll(lock){
@@ -1667,40 +1785,119 @@
     }
   }
 
+  function clearCinemaVisuals(){
+    clearTimeout(cinemaTimer);
+    cinemaTimer = null;
+    try{ mainVideo.pause(); mainVideo.removeAttribute('src'); mainVideo.load(); }catch(e){}
+    mainVideo.classList.remove('active');
+    cinemaImage.classList.remove('active');
+    cinemaText.classList.remove('active');
+    cinemaImage.removeAttribute('src');
+    cinemaText.textContent = '';
+  }
+
+  function renderCinemaProgress(){
+    if(!cinemaProgress) return;
+    cinemaProgress.innerHTML = '';
+    var seq = CONFIG.media.donationSequence || [];
+    seq.forEach(function(_, idx){
+      var dot = document.createElement('span');
+      if(idx < cinemaIndex) dot.className = 'done';
+      else if(idx === cinemaIndex) dot.className = 'current';
+      cinemaProgress.appendChild(dot);
+    });
+  }
+
+  function mediaExists(url, type){
+    return new Promise(function(resolve){
+      if(type === 'image'){
+        var probe = new Image();
+        probe.onload = function(){ resolve(true); };
+        probe.onerror = function(){ resolve(false); };
+        probe.src = url;
+      } else {
+        var probeVideo = document.createElement('video');
+        var settled = false;
+        function done(ok){ if(settled) return; settled = true; probeVideo.removeAttribute('src'); resolve(ok); }
+        probeVideo.preload = 'metadata';
+        probeVideo.onloadedmetadata = function(){ done(true); };
+        probeVideo.onerror = function(){ done(false); };
+        probeVideo.src = url;
+        setTimeout(function(){ done(false); }, 5000);
+      }
+    });
+  }
+
+  async function playCinemaItem(runId){
+    if(runId !== cinemaRunId) return;
+    var seq = CONFIG.media.donationSequence || [];
+    if(cinemaIndex >= seq.length){ finishCinema(); return; }
+    clearCinemaVisuals();
+    renderCinemaProgress();
+    var item = seq[cinemaIndex];
+    if(cinemaStatus) cinemaStatus.textContent = '';
+
+    if(item.type === 'text'){
+      cinemaText.textContent = item.text || '';
+      requestAnimationFrame(function(){ cinemaText.classList.add('active'); });
+      cinemaTimer = setTimeout(function(){ cinemaIndex++; playCinemaItem(runId); }, item.duration || 3000);
+      return;
+    }
+
+    var exists = await mediaExists(item.src, item.type);
+    if(runId !== cinemaRunId) return;
+    if(!exists){ cinemaIndex++; playCinemaItem(runId); return; }
+
+    if(item.type === 'image'){
+      cinemaImage.src = item.src;
+      requestAnimationFrame(function(){ cinemaImage.classList.add('active'); });
+      cinemaTimer = setTimeout(function(){ cinemaIndex++; playCinemaItem(runId); }, item.duration || 3400);
+      return;
+    }
+
+    if(item.type === 'video'){
+      mainVideo.src = item.src;
+      mainVideo.currentTime = 0;
+      mainVideo.onended = function(){ cinemaIndex++; playCinemaItem(runId); };
+      mainVideo.onerror = function(){ cinemaIndex++; playCinemaItem(runId); };
+      requestAnimationFrame(function(){ mainVideo.classList.add('active'); });
+      try{
+        var playPromise = mainVideo.play();
+        if(playPromise && playPromise.catch){
+          playPromise.catch(function(){
+            if(cinemaStatus) cinemaStatus.textContent = 'Devam etmek için ekrana dokun.';
+            var resume = function(){
+              videoOverlay.removeEventListener('click', resume);
+              mainVideo.play().catch(function(){ cinemaIndex++; playCinemaItem(runId); });
+            };
+            videoOverlay.addEventListener('click', resume, { once:true });
+          });
+        }
+      }catch(e){ cinemaIndex++; playCinemaItem(runId); }
+    }
+  }
+
   function openVideoOverlay(){
+    cinemaRunId++;
+    cinemaIndex = 0;
     videoOverlay.classList.add('active');
     lockBodyScroll(true);
+    playCinemaItem(cinemaRunId);
   }
-  function closeVideoOverlay(){
+
+  function finishCinema(){
+    cinemaRunId++;
+    clearCinemaVisuals();
     videoOverlay.classList.remove('active');
     lockBodyScroll(false);
-    try{ mainVideo.pause(); }catch(e){}
     if(!state.videoDone){ state.videoDone = true; saveState(); }
     showScreen('s-close');
   }
 
+  function closeVideoOverlay(){ finishCinema(); }
+
   var btnWatchVideo = document.getElementById('btnWatchVideo');
   if(btnWatchVideo) btnWatchVideo.addEventListener('click', openVideoOverlay);
-
-  if(videoPlayBtn) videoPlayBtn.addEventListener('click', function(){
-    var p = mainVideo.play();
-    if(p && p.then){
-      p.then(function(){
-        videoControls.style.display = 'none';
-        videoNote.style.display = 'none';
-      }).catch(function(){
-        videoNote.textContent = 'Video henüz eklenmedi. Kapatıp devam edebilirsin.';
-      });
-    } else {
-      videoControls.style.display = 'none';
-      videoNote.style.display = 'none';
-    }
-  });
-  mainVideo.addEventListener('ended', closeVideoOverlay);
-  mainVideo.addEventListener('error', function(){
-    videoNote.textContent = 'video.mp4 henüz eklenmedi. Kapatıp devam edebilirsin.';
-    videoControls.style.display = 'none';
-  });
   if(videoCloseBtn) videoCloseBtn.addEventListener('click', closeVideoOverlay);
 
   /* ========================================================================
@@ -1842,6 +2039,7 @@
       var full=document.getElementById('fullCodeReveal');
       if(full) full.classList.toggle('show', !!data);
     }
+    if(key==='horsePhoto' || key==='rideFavorite') updateAfterRideContinue();
   }
   $all('[data-upload]').forEach(function(card){
     var key=card.getAttribute('data-upload'), input=$('.file-input',card);
@@ -1865,6 +2063,18 @@
     });
   });
   $all('[data-upload-next]').forEach(function(btn){ btn.addEventListener('click', function(){ var key=btn.getAttribute('data-upload-next'); if(state.uploads[key]) showScreen(btn.getAttribute('data-next')); }); });
+
+  function updateAfterRideContinue(){
+    var btn=document.getElementById('afterRideContinueBtn');
+    if(!btn) return;
+    btn.disabled=!(state.quiz.afterRideFeeling && state.uploads.horsePhoto && state.uploads.rideFavorite);
+  }
+  var afterRideContinueBtn=document.getElementById('afterRideContinueBtn');
+  if(afterRideContinueBtn) afterRideContinueBtn.addEventListener('click',function(){
+    if(!afterRideContinueBtn.disabled) showScreen('s-ch2');
+  });
+
+  updateAfterRideContinue();
 
   /* ========================================================================
      ARABA SELFIE GÖREVİ — yerel saate göre 11:00'de açılır
@@ -2082,11 +2292,12 @@
      FORTSCHRITTS-FAB & OVERLAY
   ======================================================================== */
   var NODES = [
-    { key:'start', generic:'Başlangıç', real:'Buluşma', test:function(s){ return s.solved.indexOf('meeting') !== -1; } },
-    { key:'ch1',   generic:'Bölüm 1',   real:'Geçmişten bir mutluluk', test:function(s){ return s.solved.indexOf('afterRiding') !== -1; } },
-    { key:'ch2',   generic:'Bölüm 2',   real:'Bize ait bir yer', test:function(s){ return s.solved.indexOf('atRhine') !== -1; } },
-    { key:'gifts', generic:'Hediyeler', real:'Hediyeler ✓', test:function(s){ return s.solved.indexOf('unlockFinal') !== -1; } },
-    { key:'final', generic:'Final',     real:'Son bir sürpriz', test:function(s){ return s.videoDone; } }
+    { key:'start', generic:'Başlangıç', real:'Başlangıç', test:function(s){ return s.visitedScreens.indexOf('s-overview') !== -1; } },
+    { key:'meeting', generic:'Bir sonraki adım', real:'Buluşma', test:function(s){ return s.solved.indexOf('meeting') !== -1; } },
+    { key:'memory', generic:'Küçük bir sürpriz', real:'Geçmişten bir mutluluk', test:function(s){ return s.solved.indexOf('afterRiding') !== -1; } },
+    { key:'place', generic:'Devam ediyor...', real:'Bize ait bir yer', test:function(s){ return s.solved.indexOf('atRhine') !== -1; } },
+    { key:'gifts', generic:'Bir sonraki bölüm', real:'Hediyeler', test:function(s){ return s.solved.indexOf('unlockFinal') !== -1; } },
+    { key:'final', generic:'Final', real:'Son bir sürpriz', test:function(s){ return s.videoDone; } }
   ];
   function renderProgress(){
     var list = document.getElementById('progressList');
@@ -2098,7 +2309,7 @@
       var li = document.createElement('li');
       li.className = 'progress-item' + (done ? ' done' : (!currentAssigned ? ' current' : ''));
       if(!done && !currentAssigned) currentAssigned = true;
-      var dot = document.createElement('span'); dot.className = 'progress-dot';
+      var dot = document.createElement('span'); dot.className = 'progress-dot'; dot.textContent = done ? '✓' : (li.classList.contains('current') ? '●' : '✦');
       var label = document.createElement('span'); label.textContent = done ? n.real : n.generic;
       li.appendChild(dot); li.appendChild(label);
       list.appendChild(li);
@@ -2220,19 +2431,9 @@
   ======================================================================== */
   document.getElementById('pickupTimeHeadline').textContent = CONFIG.pickupTime + "'da seni almaya geliyorum.";
 
-  // Video-Quelle aus CONFIG anbinden (Punkt 9) — keine automatische Wiedergabe.
-  (function wireVideoSource(){
-    var videoSource = mainVideo.querySelector('source');
-    if(videoSource){
-      videoSource.src = CONFIG.media.video;
-    } else {
-      mainVideo.src = CONFIG.media.video;
-    }
-    mainVideo.load();
-  })();
 
   // Musik-Quelle aus CONFIG anbinden (Punkt 8) — wird erst bei echtem Klick
-  // auf "Kutuyu aç" abgespielt, hier nur die Quelle vorbereiten.
+  // auf "Zarfı aç" abgespielt, hier nur die Quelle vorbereiten.
   if(childhoodMusic){
     childhoodMusic.src = CONFIG.media.music;
   }
@@ -2247,7 +2448,7 @@
     if(target === 's-final-video') startParticles();
     restoreSubState(target);
     updatePreferencesUI();
-    ['her','kuymak','kuymakSelfie','carSelfie'].forEach(updateUploadCard);
+    ['her','kuymak','kuymakSelfie','carSelfie','horsePhoto','rideFavorite'].forEach(updateUploadCard);
     if(target === 's-car-selfie') startCarMissionTimer();
     scheduleDiscoveryHint(target);
     if(state.visitedScreens.indexOf(target) === -1) state.visitedScreens.push(target);
