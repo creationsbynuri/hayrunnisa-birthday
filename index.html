@@ -1066,6 +1066,7 @@
   <button class="btn btn-outline" id="progressCloseBtn" type="button">Kapat</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
   'use strict';
@@ -1094,6 +1095,11 @@
       childhood: 'childhood.jpg',
       music: 'music.mp3',
       video: 'video.mp4'
+    },
+    supabase: {
+      url: 'https://bfbpnxglltzteijqpenz.supabase.co',
+      key: 'sb_publishable_cSU2V3xJxadzjGmCbfkg6w_Lrl8LXPd',
+      bucket: 'birthday-photos'
     }
   };
 
@@ -1115,7 +1121,8 @@
     videoDone: false,
     eveningRevealed: false,
     preferences: {},
-    uploads: {}
+    uploads: {},
+    remoteUploads: {}
   };
   function cloneDefault(){ return JSON.parse(JSON.stringify(defaultState)); }
   function loadState(){
@@ -1131,8 +1138,85 @@
   var state = loadState();
   if(!state.preferences || typeof state.preferences !== 'object') state.preferences = {};
   if(!state.uploads || typeof state.uploads !== 'object') state.uploads = {};
+  if(!state.remoteUploads || typeof state.remoteUploads !== 'object') state.remoteUploads = {};
+
+  var supabaseClient = null;
+  var supabaseUser = null;
+  var remoteSaveTimer = null;
+  var remoteReady = false;
+
   function saveState(){
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+    scheduleRemoteSave();
+  }
+
+  function remotePayload(){
+    if(!supabaseUser) return null;
+    return {
+      id: supabaseUser.id,
+      current_screen: state.screen,
+      food_choice: state.preferences.food || null,
+      day_wish: state.preferences.need || null,
+      quiz_answers: state.quiz || {},
+      solved_codes: state.solved || [],
+      childhood_opened: !!state.childhoodOpened,
+      video_done: !!state.videoDone,
+      evening_revealed: !!state.eveningRevealed,
+      photo_paths: state.remoteUploads || {},
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  function scheduleRemoteSave(){
+    if(!remoteReady || !supabaseClient || !supabaseUser) return;
+    clearTimeout(remoteSaveTimer);
+    remoteSaveTimer = setTimeout(function(){
+      var payload = remotePayload();
+      if(!payload) return;
+      supabaseClient.from('birthday_sessions').upsert(payload, { onConflict: 'id' })
+        .then(function(result){
+          if(result.error) console.warn('Supabase save:', result.error.message);
+        }).catch(function(){});
+    }, 350);
+  }
+
+  function mergeRemoteSession(row){
+    if(!row) return;
+    if(row.current_screen && document.getElementById(row.current_screen)) state.screen = row.current_screen;
+    if(row.food_choice) state.preferences.food = row.food_choice;
+    if(row.day_wish) state.preferences.need = row.day_wish;
+    if(row.quiz_answers && typeof row.quiz_answers === 'object') state.quiz = row.quiz_answers;
+    if(Array.isArray(row.solved_codes)) state.solved = row.solved_codes;
+    if(typeof row.childhood_opened === 'boolean') state.childhoodOpened = row.childhood_opened;
+    if(typeof row.video_done === 'boolean') state.videoDone = row.video_done;
+    if(typeof row.evening_revealed === 'boolean') state.eveningRevealed = row.evening_revealed;
+    if(row.photo_paths && typeof row.photo_paths === 'object') state.remoteUploads = row.photo_paths;
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  async function initSupabase(){
+    try{
+      if(!window.supabase || !CONFIG.supabase.url || !CONFIG.supabase.key) return;
+      supabaseClient = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.key, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+      });
+      var sessionResult = await supabaseClient.auth.getSession();
+      var session = sessionResult.data && sessionResult.data.session;
+      if(!session){
+        var signInResult = await supabaseClient.auth.signInAnonymously();
+        if(signInResult.error) throw signInResult.error;
+        session = signInResult.data.session;
+      }
+      supabaseUser = session && session.user;
+      if(!supabaseUser) return;
+      var remoteResult = await supabaseClient.from('birthday_sessions').select('*').eq('id', supabaseUser.id).maybeSingle();
+      if(remoteResult.error) console.warn('Supabase load:', remoteResult.error.message);
+      if(remoteResult.data) mergeRemoteSession(remoteResult.data);
+      remoteReady = true;
+      scheduleRemoteSave();
+    }catch(e){
+      console.warn('Supabase init:', e && e.message ? e.message : e);
+    }
   }
 
   /* ========================================================================
@@ -1514,6 +1598,20 @@
     for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
     return new File([arr], name+'.jpg', {type:mime});
   }
+  async function uploadPhotoToSupabase(key, dataUrl){
+    if(!supabaseClient || !supabaseUser) throw new Error('Bağlantı henüz hazır değil.');
+    var path = supabaseUser.id + '/' + key + '-' + Date.now() + '.jpg';
+    var file = dataUrlToFile(dataUrl, key);
+    var result = await supabaseClient.storage.from(CONFIG.supabase.bucket).upload(path, file, {
+      cacheControl: '3600',
+      contentType: 'image/jpeg',
+      upsert: false
+    });
+    if(result.error) throw result.error;
+    state.remoteUploads[key] = result.data.path;
+    saveState();
+    return result.data.path;
+  }
   function updateUploadCard(key){
     var card=document.querySelector('[data-upload="'+key+'"]'); if(!card) return;
     var data=state.uploads[key], preview=$('.upload-preview',card), img=$('img',card), status=$('.upload-status',card);
@@ -1536,11 +1634,19 @@
     input.addEventListener('change', function(){
       var file=input.files && input.files[0]; if(!file) return;
       var status=$('.upload-status',card); if(status) status.textContent='Fotoğraf hazırlanıyor...';
-      compressImage(file, 640, .62).then(function(data){
+      compressImage(file, 640, .62).then(async function(data){
         state.uploads[key]=data;
         saveState();
         updateUploadCard(key);
-        smallConfetti();
+        if(status) status.textContent='Fotoğraf yükleniyor...';
+        try{
+          await uploadPhotoToSupabase(key, data);
+          if(status) status.textContent='Fotoğraf kaydedildi ✓';
+          smallConfetti();
+        }catch(e){
+          if(status) status.textContent='Fotoğraf cihazda hazır. İnternet gelince tekrar seçerek yükleyebilirsin.';
+          console.warn('Photo upload:', e && e.message ? e.message : e);
+        }
       }).catch(function(){ if(status) status.textContent='Fotoğraf okunamadı. Lütfen tekrar dene.'; });
     });
   });
@@ -1767,7 +1873,7 @@
     childhoodMusic.src = CONFIG.media.music;
   }
 
-  (function init(){
+  async function renderInitialState(){
     var target = document.getElementById(state.screen) ? state.screen : 's-hero';
     $all('.screen').forEach(function(s){ s.classList.remove('active'); });
     var el = document.getElementById(target);
@@ -1779,6 +1885,11 @@
     updatePreferencesUI();
     ['her','kuymak','kuymakSelfie','carSelfie'].forEach(updateUploadCard);
     if(target === 's-car-selfie') startCarMissionTimer();
+  }
+
+  (async function init(){
+    await initSupabase();
+    await renderInitialState();
   })();
 
 })();
